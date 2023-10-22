@@ -1,17 +1,9 @@
-WITH unpaid AS (
-SELECT *
-FROM customers
-JOIN orders
-ON customers.customer_id = orders.customer_id
-WHERE order_status = 'unpaid'),
-
-owed AS (
-SELECT *
-FROM unpaid
+SELECT customers.customer_name AS 'Customer',
+	PRINTF('$%.2f', SUM((subscriptions.subscription_length * subscriptions.price_per_month))) AS 'Amount Due'
+FROM orders
+JOIN customers 
+	ON orders.customer_id = customers.customer_id
 JOIN subscriptions
-ON subscriptions.subscription_id = unpaid.subscription_id
-WHERE "description" = 'Fashion Magazine')
-
-SELECT customer_name AS Customer, printf('$%.2f',SUM(price_per_month*subscription_length)) AS "Amouennt Due"
-FROM owed
-GROUP BY Customer;
+	ON orders.subscription_id = subscriptions.subscription_id
+WHERE order_status = 'unpaid' AND subscriptions.description = 'Fashion Magazine'
+GROUP by customers.customer_name;
